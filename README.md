@@ -73,15 +73,6 @@ Contact form submission. Sends confirmation email to client and notification to 
 }
 ```
 
-### POST `/api/newsletter`
-Newsletter subscription.
-
-**Request Body:**
-```json
-{
-  "email": "subscriber@example.com"
-}
-```
 
 ### GET `/api/health`
 Health check endpoint.

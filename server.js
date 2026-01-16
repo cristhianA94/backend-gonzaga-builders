@@ -4,7 +4,7 @@
  * 
  * Endpoints:
  * - POST /api/enviar-contacto - Contact form submission
- * - POST /api/newsletter - Newsletter subscription
+ * - POST /api/newsletter - Newsletter subscription (Desactivada)
  * - GET /api/health - Health check
  */
 
@@ -25,7 +25,10 @@ const corsOptions = {
 };
 
 // Middleware
+// PROD
 app.use(cors(corsOptions));
+//DEV
+//app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -88,32 +91,173 @@ function getClientEmailHtml(name, email, phone, service, message) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; color: #2A2A2A; background-color: #F5F5F5; line-height: 1.6; }
-        .email-container { max-width: 600px; margin: 0 auto; background-color: #FFFFFF; }
-        .header { background: linear-gradient(135deg, #0d1e3c 0%, #0d1e3c 100%); padding: 40px 30px; text-align: center; border-bottom: 4px solid #e6af2a; }
-        .header-logo { max-width: 250px; height: auto; margin: -50px auto -20px; display: block; }
-        .header h1 { color: #FFFFFF; font-family: 'Playfair Display', Georgia, serif; font-size: 28px; font-weight: 700; margin: 0 0 8px 0; }
-        .header p { color: #e6af2a; font-size: 14px; margin: 0; font-weight: 500; }
-        .content { padding: 40px 30px; background-color: #FFFFFF; }
-        .content h2 { font-family: 'Playfair Display', Georgia, serif; color: #0d1e3c; font-size: 24px; margin-bottom: 16px; }
-        .content p { margin-bottom: 16px; color: #2A2A2A; font-size: 15px; }
-        .info-box { background: #F5F5F5; padding: 24px; border-left: 4px solid #e6af2a; margin: 24px 0; border-radius: 4px; }
-        .info-box h3 { font-family: 'Playfair Display', Georgia, serif; color: #0d1e3c; font-size: 18px; margin: 0 0 16px 0; }
-        .info-box p { margin: 8px 0; font-size: 14px; }
-        .info-box strong { color: #0d1e3c; font-weight: 600; }
-        .contact-info { background: #0d1e3c; color: #FFFFFF; padding: 24px; border-radius: 4px; margin: 24px 0; }
-        .contact-info h3 { color: #e6af2a; font-size: 16px; margin-bottom: 12px; font-weight: 600; }
-        .contact-info ul { list-style: none; padding: 0; }
-        .contact-info li { margin: 8px 0; font-size: 14px; }
-        .contact-info a { color: #e6af2a; text-decoration: none; font-weight: 500; }
-        .btn { display: inline-block; background: #e6af2a; color: #0d1e3c; padding: 14px 32px; text-decoration: none; border-radius: 4px; font-weight: 600; font-size: 15px; margin: 20px 0; }
-        .highlight { background: #fff3cd; padding: 16px; border-left: 3px solid #e6af2a; margin: 20px 0; border-radius: 4px; }
-        .highlight strong { color: #0d1e3c; }
-        .footer { text-align: center; padding: 30px; background-color: #F5F5F5; border-top: 1px solid #E0E0E0; }
-        .footer p { font-size: 12px; color: #666666; margin: 4px 0; }
-        @media only screen and (max-width: 600px) { .content, .header, .footer { padding: 20px !important; } .header h1 { font-size: 22px !important; } .btn { display: block; text-align: center; } }
+        body { 
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; 
+            color: #2A2A2A; 
+            background-color: #F5F5F5;
+            line-height: 1.6;
+        }
+        .email-container { 
+            max-width: 600px; 
+            margin: 0 auto; 
+            background-color: #FFFFFF;
+        }
+        .header { 
+            background: linear-gradient(135deg, #0d1e3c 0%, #0d1e3c 100%);
+            padding: 40px 30px;
+            text-align: center;
+            border-bottom: 4px solid #e6af2a;
+        }
+        .header-logo {
+            max-width: 250px;
+            height: auto;
+            margin: -50px 0 -20px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .header h1 { 
+            color: #FFFFFF;
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 28px;
+            font-weight: 700;
+            margin: 0 0 8px 0;
+        }
+        .header p {
+            color: #e6af2a;
+            font-size: 14px;
+            margin: 0;
+            font-weight: 500;
+        }
+        .content { 
+            padding: 40px 30px;
+            background-color: #FFFFFF;
+        }
+        .content h2 {
+            font-family: 'Playfair Display', Georgia, serif;
+            color: #0d1e3c;
+            font-size: 24px;
+            margin-bottom: 16px;
+        }
+        .content p {
+            margin-bottom: 16px;
+            color: #2A2A2A;
+            font-size: 15px;
+        }
+        .info-box { 
+            background: #F5F5F5;
+            padding: 24px;
+            border-left: 4px solid #e6af2a;
+            margin: 24px 0;
+            border-radius: 4px;
+        }
+        .info-box h3 {
+            font-family: 'Playfair Display', Georgia, serif;
+            color: #0d1e3c;
+            font-size: 18px;
+            margin: 0 0 16px 0;
+        }
+        .info-box p {
+            margin: 8px 0;
+            font-size: 14px;
+        }
+        .info-box strong {
+            color: #0d1e3c;
+            font-weight: 600;
+        }
+        .contact-info {
+            background: #0d1e3c;
+            color: #FFFFFF;
+            padding: 24px;
+            border-radius: 4px;
+            margin: 24px 0;
+        }
+        .contact-info h3 {
+            color: #e6af2a;
+            font-size: 16px;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+        .contact-info ul {
+            list-style: none;
+            padding: 0;
+        }
+        .contact-info li {
+            margin: 8px 0;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+        }
+        .contact-info a {
+            color: #e6af2a;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .contact-info a:hover {
+            text-decoration: underline;
+        }
+        .btn { 
+            display: inline-block;
+            background: #e6af2a;
+            color: #0d1e3c;
+            padding: 14px 32px;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 15px;
+            margin: 20px 0;
+            transition: all 0.3s ease;
+        }
+        .btn:hover {
+            background: #d19d24;
+            transform: translateY(-2px);
+        }
+        .highlight {
+            background: #fff3cd;
+            padding: 16px;
+            border-left: 3px solid #e6af2a;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .highlight strong {
+            color: #0d1e3c;
+        }
+        .footer { 
+            text-align: center;
+            padding: 30px;
+            background-color: #F5F5F5;
+            border-top: 1px solid #E0E0E0;
+        }
+        .footer p {
+            font-size: 12px;
+            color: #666666;
+            margin: 4px 0;
+        }
+        .social-links {
+            margin: 16px 0;
+        }
+        .social-links a {
+            display: inline-block;
+            margin: 0 8px;
+            color: #0d1e3c;
+            font-size: 20px;
+            text-decoration: none;
+        }
+        @media only screen and (max-width: 600px) {
+            .content, .header, .footer {
+                padding: 20px !important;
+            }
+            .header h1 {
+                font-size: 22px !important;
+            }
+            .btn {
+                display: block;
+                text-align: center;
+            }
+        }
     </style>
 </head>
 <body>
@@ -160,8 +304,13 @@ function getClientEmailHtml(name, email, phone, service, message) {
             </p>
         </div>
         <div class="footer">
+            <div class="social-links">
+                <a href="https://www.facebook.com/GonzagaProfessionalBuilders/" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+                <a href="https://www.instagram.com/gonzagaprofessionalbuilders" title="Instagram"><i class="fab fa-instagram"></i></a>
+                <a href="https://www.tiktok.com/@gonzagaprobuilders" title="TikTok"><i class="fab fa-tiktok"></i></a>
+            </div>
             <p><strong>Gonzaga Professional Builders Inc</strong></p>
-            <p>&copy; 2026 All rights reserved.</p>
+            <p>&copy; 2024 All rights reserved.</p>
             <p>Serving Long Island, Suffolk County, and Nassau County, NY</p>
             <p style="margin-top: 12px; font-size: 11px;">
                 This is an automated email. Please do not reply to this message.<br>
@@ -192,35 +341,200 @@ function getAdminEmailHtml(name, email, phone, service, message) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; color: #2A2A2A; background-color: #F5F5F5; line-height: 1.6; }
-        .email-container { max-width: 600px; margin: 0 auto; background-color: #FFFFFF; }
-        .header { background: linear-gradient(135deg, #0d1e3c 0%, #0d1e3c 100%); padding: 40px 30px; text-align: center; border-bottom: 4px solid #e6af2a; }
-        .header-logo { max-width: 200px; height: auto; margin: -30px auto -10px; display: block; }
-        .header h1 { color: #FFFFFF; font-family: 'Playfair Display', Georgia, serif; font-size: 26px; font-weight: 700; margin: 0; }
-        .header .badge { display: inline-block; background: #e6af2a; color: #0d1e3c; padding: 8px 20px; border-radius: 20px; font-size: 14px; font-weight: 600; margin-top: 12px; }
-        .content { padding: 40px 30px; background-color: #FFFFFF; }
-        .alert-box { background: #fff3cd; border-left: 4px solid #e6af2a; padding: 20px; margin-bottom: 24px; border-radius: 4px; }
-        .alert-box h2 { font-family: 'Playfair Display', Georgia, serif; color: #0d1e3c; font-size: 22px; margin-bottom: 8px; }
-        .alert-box p { color: #2A2A2A; font-size: 14px; margin: 0; }
-        .info-section { background: #F5F5F5; padding: 24px; border-left: 4px solid #e6af2a; margin: 20px 0; border-radius: 4px; }
-        .info-section h3 { font-family: 'Playfair Display', Georgia, serif; color: #0d1e3c; font-size: 18px; margin: 0 0 16px 0; }
-        .info-row { display: flex; padding: 12px 0; border-bottom: 1px solid #E0E0E0; }
-        .info-row:last-child { border-bottom: none; }
-        .info-label { font-weight: 600; color: #0d1e3c; min-width: 120px; font-size: 14px; }
-        .info-value { color: #2A2A2A; font-size: 14px; flex: 1; }
-        .info-value a { color: #0d1e3c; text-decoration: none; font-weight: 500; }
-        .message-box { background: #FFFFFF; border: 2px solid #e6af2a; padding: 20px; margin: 20px 0; border-radius: 4px; }
-        .message-box h3 { font-family: 'Playfair Display', Georgia, serif; color: #0d1e3c; font-size: 18px; margin: 0 0 12px 0; }
-        .message-content { background: #F5F5F5; padding: 16px; border-radius: 4px; white-space: pre-wrap; font-size: 14px; line-height: 1.6; color: #2A2A2A; }
-        .action-buttons { text-align: center; margin: 30px 0; }
-        .btn { display: inline-block; background: #e6af2a; color: #0d1e3c; padding: 14px 32px; text-decoration: none; border-radius: 4px; font-weight: 600; font-size: 15px; margin: 8px; }
-        .btn-secondary { background: #0d1e3c; color: #FFFFFF; }
-        .timestamp-box { background: #0d1e3c; color: #FFFFFF; padding: 16px; text-align: center; border-radius: 4px; margin-top: 24px; }
-        .timestamp-box p { margin: 4px 0; font-size: 13px; }
-        .timestamp-box .time { color: #e6af2a; font-weight: 600; font-size: 16px; }
-        .footer { text-align: center; padding: 24px 30px; background-color: #F5F5F5; border-top: 1px solid #E0E0E0; }
-        .footer p { font-size: 12px; color: #666666; margin: 4px 0; }
-        @media only screen and (max-width: 600px) { .content, .header, .footer { padding: 20px !important; } .header h1 { font-size: 20px !important; } .info-row { flex-direction: column; } .info-label { margin-bottom: 4px; } .btn { display: block; margin: 8px 0; } }
+        body { 
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; 
+            color: #2A2A2A; 
+            background-color: #F5F5F5;
+            line-height: 1.6;
+        }
+        .email-container { 
+            max-width: 600px; 
+            margin: 0 auto; 
+            background-color: #FFFFFF;
+        }
+        .header { 
+            background: linear-gradient(135deg, #0d1e3c 0%, #0d1e3c 100%);
+            padding: 40px 30px;
+            text-align: center;
+            border-bottom: 4px solid #e6af2a;
+        }
+        .header-logo {
+            max-width: 200px;
+            height: auto;
+            margin: -30px 0 -10px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .header h1 { 
+            color: #FFFFFF;
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 26px;
+            font-weight: 700;
+            margin: 0;
+        }
+        .header .badge {
+            display: inline-block;
+            background: #e6af2a;
+            color: #0d1e3c;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-top: 12px;
+        }
+        .content { 
+            padding: 40px 30px;
+            background-color: #FFFFFF;
+        }
+        .alert-box {
+            background: #fff3cd;
+            border-left: 4px solid #e6af2a;
+            padding: 20px;
+            margin-bottom: 24px;
+            border-radius: 4px;
+        }
+        .alert-box h2 {
+            font-family: 'Playfair Display', Georgia, serif;
+            color: #0d1e3c;
+            font-size: 22px;
+            margin-bottom: 8px;
+        }
+        .alert-box p {
+            color: #2A2A2A;
+            font-size: 14px;
+            margin: 0;
+        }
+        .info-section { 
+            background: #F5F5F5;
+            padding: 24px;
+            border-left: 4px solid #e6af2a;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .info-section h3 {
+            font-family: 'Playfair Display', Georgia, serif;
+            color: #0d1e3c;
+            font-size: 18px;
+            margin: 0 0 16px 0;
+            display: flex;
+            align-items: center;
+        }
+        .info-row {
+            display: flex;
+            padding: 12px 0;
+            border-bottom: 1px solid #E0E0E0;
+        }
+        .info-row:last-child {
+            border-bottom: none;
+        }
+        .info-label {
+            font-weight: 600;
+            color: #0d1e3c;
+            min-width: 120px;
+            font-size: 14px;
+        }
+        .info-value {
+            color: #2A2A2A;
+            font-size: 14px;
+            flex: 1;
+        }
+        .info-value a {
+            color: #0d1e3c;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .info-value a:hover {
+            color: #e6af2a;
+            text-decoration: underline;
+        }
+        .message-box {
+            background: #FFFFFF;
+            border: 2px solid #e6af2a;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .message-box h3 {
+            font-family: 'Playfair Display', Georgia, serif;
+            color: #0d1e3c;
+            font-size: 18px;
+            margin: 0 0 12px 0;
+        }
+        .message-content {
+            background: #F5F5F5;
+            padding: 16px;
+            border-radius: 4px;
+            white-space: pre-wrap;
+            font-size: 14px;
+            line-height: 1.6;
+            color: #2A2A2A;
+        }
+        .action-buttons {
+            text-align: center;
+            margin: 30px 0;
+        }
+        .btn { 
+            display: inline-block;
+            background: #e6af2a;
+            color: #0d1e3c;
+            padding: 14px 32px;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 15px;
+            margin: 8px;
+        }
+        .btn-secondary {
+            background: #0d1e3c;
+            color: #FFFFFF;
+        }
+        .timestamp-box {
+            background: #0d1e3c;
+            color: #FFFFFF;
+            padding: 16px;
+            text-align: center;
+            border-radius: 4px;
+            margin-top: 24px;
+        }
+        .timestamp-box p {
+            margin: 4px 0;
+            font-size: 13px;
+        }
+        .timestamp-box .time {
+            color: #e6af2a;
+            font-weight: 600;
+            font-size: 16px;
+        }
+        .footer { 
+            text-align: center;
+            padding: 24px 30px;
+            background-color: #F5F5F5;
+            border-top: 1px solid #E0E0E0;
+        }
+        .footer p {
+            font-size: 12px;
+            color: #666666;
+            margin: 4px 0;
+        }
+        @media only screen and (max-width: 600px) {
+            .content, .header, .footer {
+                padding: 20px !important;
+            }
+            .header h1 {
+                font-size: 20px !important;
+            }
+            .info-row {
+                flex-direction: column;
+            }
+            .info-label {
+                margin-bottom: 4px;
+            }
+            .btn {
+                display: block;
+                margin: 8px 0;
+            }
+        }
     </style>
 </head>
 <body>
@@ -301,7 +615,7 @@ app.post('/api/enviar-contacto', async (req, res) => {
         await transporter.sendMail({
             from: `"Gonzaga Professional Builders Inc" <${process.env.EMAIL_USER}>`,
             to: email,
-            subject: '✅ We Received Your Inquiry - Gonzaga Professional Builders Inc',
+            subject: 'We Received Your Inquiry - Gonzaga Professional Builders Inc',
             html: getClientEmailHtml(name, email, phone, service, message)
         });
         console.log('✅ Email sent to client:', email);
@@ -310,10 +624,9 @@ app.post('/api/enviar-contacto', async (req, res) => {
         await transporter.sendMail({
             from: `"Gonzaga Builders" <${process.env.EMAIL_USER}>`,
             to: process.env.ADMIN_EMAIL,
-            subject: `🔔 New Contact from ${name}`,
+            subject: `New Contact from ${name}`,
             html: getAdminEmailHtml(name, email, phone, service, message)
         });
-        console.log('✅ Email sent to admin');
 
         res.json({
             success: true,
@@ -335,6 +648,7 @@ app.post('/api/enviar-contacto', async (req, res) => {
  * POST /api/newsletter
  * Newsletter subscription endpoint
  */
+/** 
 app.post('/api/newsletter', async (req, res) => {
     try {
         const { email } = req.body;
@@ -389,6 +703,7 @@ app.post('/api/newsletter', async (req, res) => {
         });
     }
 });
+*/
 
 /**
  * GET /api/health
@@ -397,7 +712,7 @@ app.post('/api/newsletter', async (req, res) => {
 app.get('/api/health', (req, res) => {
     res.json({
         status: 'OK',
-        service: 'Gonzaga Builders API',
+        service: 'Gonzaga Professional Builders API',
         timestamp: new Date().toISOString()
     });
 });
@@ -432,7 +747,7 @@ app.listen(PORT, () => {
 ║   🏗️  Gonzaga Builders API                 ║
 ║   ✅  Server running on port ${PORT}         ║
 ║   📧  Email service configured            ║
-║   🌐  CORS: ${process.env.FRONTEND_URL || 'Not configured'}
+║   🌐  CORS: ${process.env.FRONTEND_URL || 'Not configured'}   ║
 ╚═══════════════════════════════════════════╝
     `);
 });
