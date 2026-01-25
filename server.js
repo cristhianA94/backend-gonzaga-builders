@@ -51,8 +51,8 @@ app.use(express.urlencoded({ extended: true }));
 // Email transporter configuration
 const transporter = nodemailer.createTransport({
     host: 'smtp.gmail.com',
-    port: 587,
-    secure: false, // true for 465, false for other ports
+    port: 465,
+    secure: true, // true for 465 (SSL)
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASSWORD
@@ -60,7 +60,7 @@ const transporter = nodemailer.createTransport({
     tls: {
         rejectUnauthorized: false
     },
-    connectionTimeout: 10000, // 10 seconds
+    connectionTimeout: 10000,
     greetingTimeout: 10000,
     socketTimeout: 10000
 });
