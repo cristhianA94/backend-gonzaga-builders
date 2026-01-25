@@ -3,7 +3,7 @@
  * Node.js + Express + Nodemailer
  * 
  * Endpoints:
- * - POST /api/enviar-contacto - Contact form submission
+ * - POST /api/send-contact - Contact form submission
  * - POST /api/newsletter - Newsletter subscription (Desactivada)
  * - GET /api/health - Health check
  */
@@ -594,10 +594,10 @@ function getAdminEmailHtml(name, email, phone, service, message) {
 }
 
 /**
- * POST /api/enviar-contacto
+ * POST /api/send-contact
  * Contact form submission endpoint
  */
-app.post('/api/enviar-contacto', async (req, res) => {
+app.post('/api/send-contact', async (req, res) => {
     try {
         const { name, email, phone, service, message } = req.body;
 
@@ -638,8 +638,8 @@ app.post('/api/enviar-contacto', async (req, res) => {
         console.error('❌ Error sending email:', error);
         res.status(500).json({
             success: false,
-            error: 'Error processing request',
-            detalles: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+            error: 'Failed to send contact email',
+            detalles: 'An unexpected error occurred while processing your request.'
         });
     }
 });

@@ -32,7 +32,6 @@ ADMIN_EMAIL=admin@gonzagabuilders.com
 
 # Server configuration
 PORT=3000
-NODE_ENV=development
 
 # Frontend URL (for CORS)
 FRONTEND_URL=https://gonzagabuilders.com
@@ -48,7 +47,7 @@ FRONTEND_URL=https://gonzagabuilders.com
 
 ## 📡 API Endpoints
 
-### POST `/api/enviar-contacto`
+### POST `/api/send-contact`
 Contact form submission. Sends confirmation email to client and notification to admin.
 
 **Request Body:**
