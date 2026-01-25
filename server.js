@@ -1,6 +1,6 @@
 /**
  * Gonzaga Professional Builders - Backend API
- * Node.js + Express + Nodemailer
+ * Node.js + Express + Resend
  * 
  * Endpoints:
  * - POST /api/send-contact - Contact form submission
@@ -9,7 +9,7 @@
  */
 
 import express from 'express';
-import nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 import cors from 'cors';
 import 'dotenv/config';
 
@@ -48,31 +48,15 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Email transporter configuration
-const transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 465,
-    secure: true, // true for 465 (SSL)
-    auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASSWORD
-    },
-    tls: {
-        rejectUnauthorized: false
-    },
-    connectionTimeout: 10000,
-    greetingTimeout: 10000,
-    socketTimeout: 10000
-});
+// Resend email service configuration
+const resend = new Resend(process.env.RESEND_API_KEY);
 
-// Verify email connection on startup
-transporter.verify((error) => {
-    if (error) {
-        console.error('❌ Gmail connection error:', error.message);
-    } else {
-        console.log('✅ Email server ready');
-    }
-});
+// Verify Resend API key on startup
+if (!process.env.RESEND_API_KEY) {
+    console.error('❌ RESEND_API_KEY is not configured');
+} else {
+    console.log('✅ Resend email service configured');
+}
 
 // Service mapping
 const SERVICES = {
@@ -636,8 +620,8 @@ app.post('/api/send-contact', async (req, res) => {
         }
 
         // Send confirmation email to client
-        await transporter.sendMail({
-            from: `"Gonzaga Professional Builders Inc" <${process.env.EMAIL_USER}>`,
+        await resend.emails.send({
+            from: process.env.EMAIL_FROM || 'Gonzaga Builders <onboarding@resend.dev>',
             to: email,
             subject: 'We Received Your Inquiry - Gonzaga Professional Builders Inc',
             html: getClientEmailHtml(name, email, phone, service, message)
@@ -645,12 +629,13 @@ app.post('/api/send-contact', async (req, res) => {
         console.log('✅ Email sent to client:', email);
 
         // Send notification email to admin
-        await transporter.sendMail({
-            from: `"Gonzaga Builders" <${process.env.EMAIL_USER}>`,
+        await resend.emails.send({
+            from: process.env.EMAIL_FROM || 'Gonzaga Builders <onboarding@resend.dev>',
             to: process.env.ADMIN_EMAIL,
             subject: `New Contact from ${name}`,
             html: getAdminEmailHtml(name, email, phone, service, message)
         });
+        console.log('✅ Notification sent to admin');
 
         res.json({
             success: true,

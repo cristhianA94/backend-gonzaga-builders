@@ -1,15 +1,12 @@
 # Gonzaga Builders - Backend API
 
-Backend API for Gonzaga Professional Builders website. Handles contact form submissions and newsletter subscriptions via email.
+Backend API for Gonzaga Professional Builders website. Handles contact form submissions via email using Resend.
 
 ## 🚀 Quick Start
 
 ```bash
 # Install dependencies
 npm install
-
-# Copy environment file and configure
-cp .env.example .env
 
 # Run development server
 npm run dev
@@ -23,27 +20,44 @@ npm start
 Create a `.env` file with the following variables:
 
 ```env
-# Gmail SMTP Configuration
-EMAIL_USER=your-gmail@gmail.com
-EMAIL_PASSWORD=your-16-char-app-password
+# Resend API Key (Get from https://resend.com/api-keys)
+RESEND_API_KEY=re_your_api_key_here
 
-# Admin notification email
-ADMIN_EMAIL=admin@gonzagabuilders.com
+# Email Configuration
+# Use onboarding@resend.dev if domain not verified, or info@gonzagabuilders.com if verified
+EMAIL_FROM=Gonzaga Builders <info@gonzagabuilders.com>
+ADMIN_EMAIL=info@gonzagabuilders.com
+
+# Frontend URL (for CORS)
+FRONTEND_URL=https://www.gonzagabuilders.com
 
 # Server configuration
 PORT=3000
-
-# Frontend URL (for CORS)
-FRONTEND_URL=https://gonzagabuilders.com
 ```
 
-### Gmail App Password Setup
+### Resend Setup (Email Service)
 
-1. Go to [Google Account Security](https://myaccount.google.com/security)
-2. Enable 2-Factor Authentication
-3. Go to [App Passwords](https://myaccount.google.com/apppasswords)
-4. Create a new app password for "Mail"
-5. Use the 16-character password in `EMAIL_PASSWORD`
+1. **Create Resend Account** (Free - 3,000 emails/month)
+   - Go to [resend.com/signup](https://resend.com/signup)
+   - Sign up and verify your email
+
+2. **Get API Key**
+   - Visit [resend.com/api-keys](https://resend.com/api-keys)
+   - Click "Create API Key"
+   - Copy the key (starts with `re_...`)
+
+3. **Verify Domain** (Optional but recommended)
+   - Go to [resend.com/domains](https://resend.com/domains)
+   - Add `gonzagabuilders.com`
+   - Follow DNS configuration instructions
+   - Until verified, use `onboarding@resend.dev` as `EMAIL_FROM`
+
+**Why Resend?**
+- ✅ No SMTP port blocking issues (works on Railway, Vercel, etc.)
+- ✅ Better email deliverability
+- ✅ 3,000 emails/month free
+- ✅ Dashboard with email logs
+- ✅ Professional email service
 
 ## 📡 API Endpoints
 
@@ -127,16 +141,31 @@ gonzaga-backend/
 
 - **Node.js** 18+
 - **Express** - Web framework
-- **Nodemailer** - Email sending
+- **Resend** - Email delivery service
 - **CORS** - Cross-origin requests
 - **dotenv** - Environment variables
 
-## 📞 Support
+## 🔧 Troubleshooting
 
-For issues or questions, contact the development team.
+### Emails not sending
+- Verify `RESEND_API_KEY` is correct
+- Check [Resend Dashboard](https://resend.com/emails) for logs
+- Ensure `EMAIL_FROM` uses verified domain or `onboarding@resend.dev`
+
+### CORS errors
+- Verify `FRONTEND_URL` matches your frontend domain exactly
+- Include `www` if your site uses it: `https://www.gonzagabuilders.com`
+
+### Connection issues
+- Railway/Render: Check environment variables are set correctly
+- Local: Ensure `.env` file exists and is properly formatted
+
+## 📚 Additional Documentation
+
+- [Resend Docs](https://resend.com/docs) - Official Resend documentation
 
 ---
 
-**Repository:** GitHub (Private)  
-**Frontend:** GitLab  
+**Repository:** [GitHub](https://github.com/cristhianA94/backend-gonzaga-builders)  
+**Frontend:** GitLab (Private)  
 **Last Updated:** January 2026
