@@ -1,15 +1,15 @@
 /**
  * Gonzaga Professional Builders - Backend API
- * Node.js + Express + Nodemailer
+ * Node.js + Express + Resend
  * 
  * Endpoints:
- * - POST /api/enviar-contacto - Contact form submission
+ * - POST /api/send-contact - Contact form submission
  * - POST /api/newsletter - Newsletter subscription (Desactivada)
  * - GET /api/health - Health check
  */
 
 import express from 'express';
-import nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 import cors from 'cors';
 import 'dotenv/config';
 
@@ -17,8 +17,24 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // CORS configuration - Allow frontend domain
+const allowedOrigins = [
+    'https://gonzagabuilders.com',
+    'https://www.gonzagabuilders.com',
+    'http://localhost:3000',
+    'http://127.0.0.1:3000'
+];
+
 const corsOptions = {
-    origin: process.env.FRONTEND_URL || 'https://gonzagabuilders.com',
+    origin: function (origin, callback) {
+        // Allow requests with no origin (like mobile apps or curl requests)
+        if (!origin) return callback(null, true);
+
+        if (allowedOrigins.indexOf(origin) !== -1 || process.env.FRONTEND_URL === origin) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
     methods: ['GET', 'POST'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true
@@ -32,23 +48,15 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Email transporter configuration
-const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASSWORD
-    }
-});
+// Resend email service configuration
+const resend = new Resend(process.env.RESEND_API_KEY);
 
-// Verify email connection on startup
-transporter.verify((error) => {
-    if (error) {
-        console.error('❌ Gmail connection error:', error.message);
-    } else {
-        console.log('✅ Email server ready');
-    }
-});
+// Verify Resend API key on startup
+if (!process.env.RESEND_API_KEY) {
+    console.error('❌ RESEND_API_KEY is not configured');
+} else {
+    console.log('✅ Resend email service configured');
+}
 
 // Service mapping
 const SERVICES = {
@@ -594,10 +602,10 @@ function getAdminEmailHtml(name, email, phone, service, message) {
 }
 
 /**
- * POST /api/enviar-contacto
+ * POST /api/send-contact
  * Contact form submission endpoint
  */
-app.post('/api/enviar-contacto', async (req, res) => {
+app.post('/api/send-contact', async (req, res) => {
     try {
         const { name, email, phone, service, message } = req.body;
 
@@ -612,8 +620,8 @@ app.post('/api/enviar-contacto', async (req, res) => {
         }
 
         // Send confirmation email to client
-        await transporter.sendMail({
-            from: `"Gonzaga Professional Builders Inc" <${process.env.EMAIL_USER}>`,
+        await resend.emails.send({
+            from: process.env.EMAIL_FROM || 'Gonzaga Builders <onboarding@resend.dev>',
             to: email,
             subject: 'We Received Your Inquiry - Gonzaga Professional Builders Inc',
             html: getClientEmailHtml(name, email, phone, service, message)
@@ -621,12 +629,13 @@ app.post('/api/enviar-contacto', async (req, res) => {
         console.log('✅ Email sent to client:', email);
 
         // Send notification email to admin
-        await transporter.sendMail({
-            from: `"Gonzaga Builders" <${process.env.EMAIL_USER}>`,
+        await resend.emails.send({
+            from: process.env.EMAIL_FROM || 'Gonzaga Builders <onboarding@resend.dev>',
             to: process.env.ADMIN_EMAIL,
             subject: `New Contact from ${name}`,
             html: getAdminEmailHtml(name, email, phone, service, message)
         });
+        console.log('✅ Notification sent to admin');
 
         res.json({
             success: true,
@@ -638,8 +647,8 @@ app.post('/api/enviar-contacto', async (req, res) => {
         console.error('❌ Error sending email:', error);
         res.status(500).json({
             success: false,
-            error: 'Error processing request',
-            detalles: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+            error: 'Failed to send contact email',
+            detalles: 'An unexpected error occurred while processing your request.'
         });
     }
 });
